@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Newspaper, Edit3, Rocket } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import PremiumSubscription from "@/components/PremiumSubscription";
 
 export default function Home() {
   return (
@@ -88,6 +89,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <PremiumSubscription />
     </div>
   );
 }
