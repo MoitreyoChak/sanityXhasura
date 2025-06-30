@@ -2,31 +2,44 @@
 'use client'
 
 import Link from "next/link"
+import { usePathname } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 import { Menu, PenSquare } from "lucide-react"
+import { cn } from "@/lib/utils"
+
+const navLinks = [
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  { href: "/blog", label: "Blog" },
+];
 
 export default function Header() {
+  const pathname = usePathname();
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
+      <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <PenSquare className="h-6 w-6 text-primary" />
-            <span className="hidden font-bold sm:inline-block font-headline">
+            <PenSquare className="h-7 w-7 text-primary" />
+            <span className="hidden font-bold sm:inline-block font-headline text-lg">
               Content Hub
             </span>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
-            <Link href="/" className="transition-colors hover:text-foreground/80 text-foreground/60">
-              Home
-            </Link>
-            <Link href="/about" className="transition-colors hover:text-foreground/80 text-foreground/60">
-              About
-            </Link>
-            <Link href="/blog" className="transition-colors hover:text-foreground/80 text-foreground/60">
-              Blog
-            </Link>
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "transition-colors hover:text-foreground",
+                  pathname === link.href ? "text-foreground" : "text-muted-foreground"
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
         </div>
         <Sheet>
@@ -41,21 +54,30 @@ export default function Header() {
           </SheetTrigger>
           <SheetContent side="left" className="pr-0">
             <Link href="/" className="mr-6 flex items-center space-x-2">
-                <PenSquare className="h-6 w-6 text-primary" />
-                <span className="font-bold font-headline">Content Hub</span>
+                <PenSquare className="h-7 w-7 text-primary" />
+                <span className="font-bold font-headline text-lg">Content Hub</span>
             </Link>
             <div className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
-                <div className="flex flex-col space-y-3">
-                    <Link href="/" className="text-muted-foreground">Home</Link>
-                    <Link href="/about" className="text-muted-foreground">About</Link>
-                    <Link href="/blog" className="text-muted-foreground">Blog</Link>
+                <div className="flex flex-col space-y-4">
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={cn(
+                        "transition-colors hover:text-foreground text-lg",
+                        pathname === link.href ? "text-foreground font-semibold" : "text-muted-foreground"
+                      )}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
                 </div>
             </div>
           </SheetContent>
         </Sheet>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <Link href="/studio" passHref>
-            <Button>
+            <Button variant="outline">
               Go to Studio
             </Button>
           </Link>
