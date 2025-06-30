@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import './globals.css';
 import { cn } from '@/lib/utils';
@@ -10,16 +9,15 @@ import { token } from '@/lib/sanity';
 import { VisualEditing } from "next-sanity";
 
 
-export const metadata: Metadata = {
+/** @type {import('next').Metadata} */
+export const metadata = {
   title: 'Content Hub',
   description: 'A modern content hub built with Next.js and Sanity.',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
