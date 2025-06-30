@@ -1,3 +1,5 @@
+
+
 import { Studio } from '@/components/Studio'
 
 // Ensures the Studio route is statically generated
