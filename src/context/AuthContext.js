@@ -129,6 +129,7 @@ export function AuthProvider({ children }) {
       return true;
     } catch (err) {
       const errorMessage = handleFirebaseError(err);
+      console.log("Signup error:", errorMessage);
       setError(errorMessage);
       setLoading(false);
       return false;
