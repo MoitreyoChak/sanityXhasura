@@ -1,4 +1,3 @@
-
 'use client'
 
 import Link from "next/link"
@@ -7,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 import { Menu, PenSquare } from "lucide-react"
 import { cn } from "@/lib/utils"
+import AuthDialog from "./auth/AuthDialog"
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -75,12 +75,13 @@ export default function Header() {
             </div>
           </SheetContent>
         </Sheet>
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+        <div className="flex flex-1 items-center justify-end space-x-2">
           <Link href="/studio" passHref>
             <Button variant="outline">
               Go to Studio
             </Button>
           </Link>
+          <AuthDialog />
         </div>
       </div>
     </header>
