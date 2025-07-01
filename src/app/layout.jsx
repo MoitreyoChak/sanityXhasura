@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import { PreviewProvider } from '@/components/PreviewProvider';
 import { token } from '@/lib/sanity';
 import { VisualEditing } from "next-sanity";
+import { AuthProvider } from '@/context/AuthContext';
 
 
 /** @type {import('next').Metadata} */
@@ -26,15 +27,17 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
       </head>
       <body className={cn("min-h-screen bg-background font-body antialiased")}>
-        <PreviewProvider token={token}>
-          <div className="relative flex min-h-dvh flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-          <Toaster />
-          {draftMode().isEnabled && <VisualEditing />}
-        </PreviewProvider>
+        <AuthProvider>
+          <PreviewProvider token={token}>
+            <div className="relative flex min-h-dvh flex-col">
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+            <Toaster />
+            {draftMode().isEnabled && <VisualEditing />}
+          </PreviewProvider>
+        </AuthProvider>
       </body>
     </html>
   );

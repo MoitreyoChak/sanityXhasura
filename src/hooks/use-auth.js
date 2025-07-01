@@ -1,18 +1,12 @@
-'use client'
+'use client';
 
-// This is a mock authentication hook.
-// In a real application, this would involve context providers,
-// and actual authentication logic.
+import { useContext } from 'react';
+import { AuthContext } from '@/context/AuthContext';
+
 export function useAuth() {
-  // To demonstrate the functionality, we'll simulate a user
-  // who is logged in but not a premium member.
-  // Change `isPremium` to `true` to see the component disappear.
-  const user = {
-    isLoggedIn: true,
-    isPremium: false,
-  };
-
-  return {
-    isPremium: user.isPremium,
-  };
+  const context = useContext(AuthContext);
+  if (context === null) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 }
