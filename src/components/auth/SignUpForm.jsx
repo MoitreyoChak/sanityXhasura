@@ -4,17 +4,35 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
 
-export default function SignUpForm({ onSwitch }) {
+export default function SignUpForm({ onSwitch, onSuccess }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { signup } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSignUp = (e) => {
+
+  const handleSignUp = async (e) => {
     e.preventDefault();
-    // User will add their logic here
-    console.log("Signing up with:", { name, email, password });
+    setIsLoading(true);
+    setError('');
+
+    // In a real app, the signup function would handle validation,
+    // API calls, and error handling.
+    const success = await signup(name, email, password);
+    setIsLoading(false);
+
+    if (success) {
+      onSuccess(); // Close the dialog on successful sign-up
+    } else {
+      // TODO: Display a more specific error message.
+      setError("Could not create an account. Please try again.");
+      console.error("Signup failed");
+    }
   };
 
   return (
@@ -33,6 +51,7 @@ export default function SignUpForm({ onSwitch }) {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
+              disabled={isLoading}
             />
           </div>
           <div className="grid gap-2">
@@ -44,6 +63,7 @@ export default function SignUpForm({ onSwitch }) {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
             />
           </div>
           <div className="grid gap-2">
@@ -54,15 +74,17 @@ export default function SignUpForm({ onSwitch }) {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
             />
           </div>
-          <Button type="submit" className="w-full">
-            Sign Up
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? 'Creating Account...' : 'Sign Up'}
           </Button>
         </form>
         <div className="mt-4 text-center text-sm">
           Already have an account?{" "}
-          <Button variant="link" className="p-0 h-auto" onClick={() => onSwitch('signin')}>
+          <Button variant="link" className="p-0 h-auto" onClick={() => onSwitch('signin')} disabled={isLoading}>
             Sign in
           </Button>
         </div>

@@ -8,24 +8,32 @@ import SignUpForm from "./SignUpForm";
 
 export default function AuthDialog() {
   const [view, setView] = useState('signin'); // 'signin' or 'signup'
+  const [open, setOpen] = useState(false);
 
-  // Reset to signin view when dialog is opened/closed
-  const handleOpenChange = (open) => {
-    if (!open) {
-      setView('signin');
+  // Reset to signin view when dialog is closed
+  const handleOpenChange = (isOpen) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      setTimeout(() => {
+        setView('signin');
+      }, 300); // delay to allow for closing animation
     }
   };
 
+  const handleSuccess = () => {
+    setOpen(false);
+  };
+
   return (
-    <Dialog onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button>Login</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] p-0">
         {view === 'signin' ? (
-          <SignInForm onSwitch={setView} />
+          <SignInForm onSwitch={setView} onSuccess={handleSuccess} />
         ) : (
-          <SignUpForm onSwitch={setView} />
+          <SignUpForm onSwitch={setView} onSuccess={handleSuccess} />
         )}
       </DialogContent>
     </Dialog>
