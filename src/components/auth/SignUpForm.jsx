@@ -1,35 +1,42 @@
-'use client';
+"use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/hooks/use-auth";
+import { auth } from "@/lib/firebaseClient"; // adjust import as needed
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { getHasuraToken } from "@/lib/getHasuraToken"; // adjust import as needed
 import { useState } from "react";
+import client from "@/lib/apolloClient";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function SignUpForm({ onSwitch, onSuccess }) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { signup } = useAuth();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
+  const { signup } = useAuth();
 
   const handleSignUp = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
-    // In a real app, the signup function would handle validation,
-    // API calls, and error handling.
     const success = await signup(name, email, password);
     setIsLoading(false);
 
     if (success) {
       onSuccess(); // Close the dialog on successful sign-up
     } else {
-      // TODO: Display a more specific error message.
       setError("Could not create an account. Please try again.");
       console.error("Signup failed");
     }
@@ -79,12 +86,17 @@ export default function SignUpForm({ onSwitch, onSuccess }) {
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Creating Account...' : 'Sign Up'}
+            {isLoading ? "Creating Account..." : "Sign Up"}
           </Button>
         </form>
         <div className="mt-4 text-center text-sm">
           Already have an account?{" "}
-          <Button variant="link" className="p-0 h-auto" onClick={() => onSwitch('signin')} disabled={isLoading}>
+          <Button
+            variant="link"
+            className="p-0 h-auto"
+            onClick={() => onSwitch("signin")}
+            disabled={isLoading}
+          >
             Sign in
           </Button>
         </div>
