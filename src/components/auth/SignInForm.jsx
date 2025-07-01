@@ -1,36 +1,39 @@
-'use client';
+"use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
 
 export default function SignInForm({ onSwitch, onSuccess }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { login } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { login, loading, error } = useAuth();
+  const [localError, setLocalError] = useState("");
 
   const handleSignIn = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError('');
+    setLocalError("");
 
-    // In a real app, the login function would return success/failure
-    // and potentially an error message.
+    if (!email || !password) {
+      setLocalError("Please fill in all fields");
+      return;
+    }
+
     const success = await login(email, password);
-    setIsLoading(false);
 
     if (success) {
       onSuccess(); // Close the dialog on successful login
     } else {
-      // TODO: Display an error message to the user.
-      // For now, we'll just log it.
-      setError("Invalid email or password. Please try again.");
-      console.error("Login failed");
+      setLocalError(error || "Invalid email or password. Please try again.");
     }
   };
 
@@ -38,7 +41,9 @@ export default function SignInForm({ onSwitch, onSuccess }) {
     <Card className="border-0 shadow-none">
       <CardHeader>
         <CardTitle className="text-2xl font-headline">Sign In</CardTitle>
-        <CardDescription>Enter your email below to login to your account.</CardDescription>
+        <CardDescription>
+          Enter your email below to login to your account.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSignIn} className="grid gap-4">
@@ -51,7 +56,7 @@ export default function SignInForm({ onSwitch, onSuccess }) {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
+              disabled={loading}
             />
           </div>
           <div className="grid gap-2">
@@ -62,17 +67,24 @@ export default function SignInForm({ onSwitch, onSuccess }) {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
+              disabled={loading}
             />
           </div>
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Signing In...' : 'Sign In'}
+          {(localError || error) && (
+            <p className="text-sm text-destructive">{localError || error}</p>
+          )}
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Signing In..." : "Sign In"}
           </Button>
         </form>
         <div className="mt-4 text-center text-sm">
           Don&apos;t have an account?{" "}
-          <Button variant="link" className="p-0 h-auto" onClick={() => onSwitch('signup')} disabled={isLoading}>
+          <Button
+            variant="link"
+            className="p-0 h-auto"
+            onClick={() => onSwitch("signup")}
+            disabled={loading}
+          >
             Sign up
           </Button>
         </div>

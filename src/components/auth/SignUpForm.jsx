@@ -10,11 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { auth } from "@/lib/firebaseClient"; // adjust import as needed
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { getHasuraToken } from "@/lib/getHasuraToken"; // adjust import as needed
 import { useState } from "react";
-import client from "@/lib/apolloClient";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function SignUpForm({ onSwitch, onSuccess }) {
