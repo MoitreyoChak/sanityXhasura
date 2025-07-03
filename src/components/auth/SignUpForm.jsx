@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function SignUpForm({ onSwitch, onSuccess }) {
@@ -20,7 +20,11 @@ export default function SignUpForm({ onSwitch, onSuccess }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const { signup } = useAuth();
+  const { signup, error: errorMessage } = useAuth();
+
+  useEffect(() => {
+    setError(errorMessage);
+  }, [errorMessage]);
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -33,7 +37,7 @@ export default function SignUpForm({ onSwitch, onSuccess }) {
     if (success) {
       onSuccess(); // Close the dialog on successful sign-up
     } else {
-      setError("Could not create an account. Please try again.");
+      // setError("Could not create an account. Please try again.");
       console.error("Signup failed");
     }
   };
