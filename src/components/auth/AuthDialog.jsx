@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import SignInForm from "./SignInForm";
 import SignUpForm from "./SignUpForm";
 
-export default function AuthDialog() {
+export default function AuthDialog({ children }) {
   const [view, setView] = useState('signin'); // 'signin' or 'signup'
   const [open, setOpen] = useState(false);
 
@@ -27,7 +27,7 @@ export default function AuthDialog() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button>Login</Button>
+        {children || <Button>Login</Button>}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] p-0">
         {view === 'signin' ? (

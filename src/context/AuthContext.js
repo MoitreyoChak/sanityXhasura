@@ -31,15 +31,35 @@ const GET_USER_QUERY = gql`
   }
 `;
 
+const UPGRADE_TO_PREMIUM_MUTATION = gql`
+  mutation UpgradeToPremium($userId: String!, $code: String!) {
+    update_users_by_pk(pk_columns: {id: $userId}, _set: {isPremiumMember: true}) {
+      id
+      isPremiumMember
+    }
+    insert_referralCodes_one(object: {code: $code, user_id: $userId, is_used: false}) {
+      id
+    }
+  }
+`;
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const [insertUser] = useMutation(INSERT_USER_MUTATION, {
+  const [insertUser, { loading: insertUserLoading }] = useMutation(INSERT_USER_MUTATION, {
     client,
     onError: (error) => {
       console.error("Error inserting user:", error);
+      setError(error.message);
+    },
+  });
+  
+  const [upgradeUser, { loading: upgradeLoading }] = useMutation(UPGRADE_TO_PREMIUM_MUTATION, {
+    client,
+    onError: (error) => {
+      console.error("Error upgrading user:", error);
       setError(error.message);
     },
   });
@@ -47,6 +67,7 @@ export function AuthProvider({ children }) {
   // Listen to Firebase auth state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setLoading(true);
       if (firebaseUser) {
         try {
           // Get the ID token with custom claims
@@ -85,22 +106,15 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signup = async (name, email, password) => {
-    console.log("Attempting to sign up with:", name, email, password);
     setLoading(true);
     setError('');
 
     try {
-      // Create Firebase user
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
-
-      // Wait for Firebase to process the user creation
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Get the ID token
+      await new Promise(resolve => setTimeout(resolve, 2000));
       const token = await firebaseUser.getIdToken(true);
 
-      // Insert user into Hasura using the token
       await insertUser({
         variables: {
           object: {
@@ -117,7 +131,6 @@ export function AuthProvider({ children }) {
         },
       });
 
-      // Set user state
       setUser({
         id: firebaseUser.uid,
         name: name,
@@ -136,19 +149,14 @@ export function AuthProvider({ children }) {
   };
 
   const login = async (email, password) => {
-    console.log("Attempting to log in with:", email, password);
     setLoading(true);
     setError('');
 
     try {
-      // Sign in with Firebase
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
-
-      // Get the ID token
       const token = await firebaseUser.getIdToken(true);
 
-      // Fetch user data from Hasura
       const userResult = await client.query({
         query: GET_USER_QUERY,
         variables: { id: firebaseUser.uid },
@@ -157,7 +165,7 @@ export function AuthProvider({ children }) {
             Authorization: `Bearer ${token}`,
           },
         },
-        fetchPolicy: 'network-only', // Always fetch fresh data
+        fetchPolicy: 'network-only',
       });
 
       if (userResult.data?.users_by_pk) {
@@ -190,16 +198,48 @@ export function AuthProvider({ children }) {
       setError(err.message);
     }
   };
+  
+  const upgradeToPremium = async () => {
+    if (!user) return false;
+    
+    setLoading(true);
+    setError('');
+
+    const referralCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+
+    try {
+      await upgradeUser({
+        variables: {
+          userId: user.id,
+          code: referralCode,
+        },
+      });
+
+      // Update local user state
+      setUser((prevUser) => ({
+        ...prevUser,
+        isPremium: true,
+      }));
+      setLoading(false);
+      return true;
+    } catch (err) {
+      console.error("Premium upgrade failed:", err);
+      setError("Could not complete the upgrade. Please try again.");
+      setLoading(false);
+      return false;
+    }
+  };
 
   const value = {
     user,
     isLoggedIn: !!user,
     isPremium: user?.isPremium ?? false,
-    loading,
+    loading: loading || insertUserLoading || upgradeLoading,
     error,
     login,
     logout,
     signup,
+    upgradeToPremium,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

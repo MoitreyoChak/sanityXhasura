@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
+import ReferralCodeDisplay from '@/components/ReferralCodeDisplay';
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
@@ -58,6 +59,8 @@ export default function ProfilePage() {
           </Button>
         </CardContent>
       </Card>
+      
+      {user.isPremium && <ReferralCodeDisplay userId={user.id} />}
     </div>
   );
 }
